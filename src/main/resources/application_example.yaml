@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url:
+    username:
+    password:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+    ddl-auto: update
+    show-sql: true
+  flyway:
+    baseline-on-migrate: true
+    locations: filesystem:db/migration
+#    enabled: false
