@@ -1,20 +1,28 @@
 package com.FileManager.FileManager.Entity;
 
+import com.FileManager.FileManager.DTO.Interfaces.IFile;
 import jakarta.persistence.*;
-
-import java.time.Instant;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-public class File {
+@Getter
+@Setter
+public class File implements IFile{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "file_id")
-    long fileId;
-    String extension;
+    private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "metadata_id")
-    Metadata metadata;
+    private String fileName;
+    private String fileType;
+    private Long fileSize;
+    private String filePath;
+    @ManyToOne
+    @JoinColumn(name = "directory_id")
+    private Directory directory;
 
-    java.io.File file;
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private Owner owner;
+
 }

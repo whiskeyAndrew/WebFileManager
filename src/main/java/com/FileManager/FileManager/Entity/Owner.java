@@ -3,10 +3,10 @@ package com.FileManager.FileManager.Entity;
 import jakarta.persistence.*;
 
 @Entity
-public class Person {
+public class Owner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    long userId;
+    @Column(name = "owner_id")
+    Long id;
     String username;
 }
