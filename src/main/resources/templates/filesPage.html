@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../filePage.css">
+</head>
+<body>
+
+<div th:if="${parentDirId>=0}">
+    <form th:action="@{|/dirs/${parentDirId}|}" method="get">
+        <button type="submit" th:text="Back"></button>
+    </form>
+</div>
+
+<table class="filesTable">
+    <tr>
+        <td>Id</td>
+        <td>Directory</td>
+    </tr>
+    <tr th:each="dir:${dirs}">
+        <td th:text="${dir.id}"></td>
+        <form th:action="@{|/dirs/${dir.id}|}" method="get">
+            <td>
+                <button type="submit" class="buttonLikeRow" th:text="${dir.directoryName}"></button>
+            </td>
+        </form>
+    </tr>
+</table>
+<br>
+<table class="filesTable">
+    <tr>
+        <td>Id</td>
+        <td>FileName</td>
+        <td>FileSize</td>
+    </tr>
+    <tr th:each="file:${files}">
+        <td th:text="${file.id}"></td>
+        <td th:text="|${file.fileName}.${file.fileType}|"></td>
+        <td th:text="${file.fileSize}"></td>
+        <td style="border: 0"><a class="downloadButton" th:href="|/download/${file.id}|">Download</a></td>
+    </tr>
+</table>
+</body>
+</html>

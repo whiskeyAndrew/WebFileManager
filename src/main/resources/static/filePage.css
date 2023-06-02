@@ -1,0 +1,23 @@
+.filesTable table{
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+.filesTable tr,td{
+    border: 1px solid black;
+}
+
+.buttonLikeRow{
+    background:none;
+    border:none;
+    padding:0;
+    color:blue;
+    text-decoration:underline;
+    cursor:pointer;
+}
+
+.downloadButton{
+    border: 1px solid black;
+    border-radius: 1px;
+    padding: 1px;
+}
