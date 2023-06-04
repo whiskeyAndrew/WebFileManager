@@ -3,11 +3,10 @@ package com.FileManager.FileManager.Controllers;
 import com.FileManager.FileManager.DTO.Interfaces.IDirectory;
 import com.FileManager.FileManager.DTO.Interfaces.IFile;
 import com.FileManager.FileManager.services.DirectoryService;
-import com.FileManager.FileManager.services.FileService;
-import jakarta.annotation.Resource;
+import com.FileManager.FileManager.services.EFileService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.http.*;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,13 +21,16 @@ import java.io.InputStream;
 @Controller
 @RequiredArgsConstructor
 public class FileDownloadController {
-    private final FileService fileService;
+    private final EFileService fileService;
     private final DirectoryService directoryService;
     @Value("${rootFolder}")
     private String rootFolder;
 
+    @PostConstruct
     void init() {
-        downloadFile(1L);
+        if (!rootFolder.endsWith("/")) {
+            rootFolder = rootFolder + "/";
+        }
     }
 
     @GetMapping("/download/{id}")
@@ -44,7 +45,7 @@ public class FileDownloadController {
         }
 
         StringBuilder filePath = new StringBuilder();
-        filePath.append(rootFolder).append(fullPath).append("/").append(file.getFileName()).append(".").append(file.getFileType());
+        filePath.append(rootFolder).append(fullPath).append(file.getFileName()).append(".").append(file.getFileType());
         try {
 
 

@@ -6,7 +6,7 @@ import com.FileManager.FileManager.Entity.Owner;
 import lombok.Data;
 
 @Data
-public class FileDTO implements IFile {
+public class EFileDTO implements IFile {
     private Long id;
     private String fileName;
     private String fileType;

@@ -2,7 +2,7 @@ package com.FileManager.FileManager.Controllers;
 
 import com.FileManager.FileManager.DTO.Interfaces.IDirectory;
 import com.FileManager.FileManager.services.DirectoryService;
-import com.FileManager.FileManager.services.FileService;
+import com.FileManager.FileManager.services.EFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequiredArgsConstructor
 public class FileManagerController {
 
-    private final FileService fileService;
+    private final EFileService fileService;
     private final DirectoryService directoryService;
 
     @GetMapping("/dirs/{id}")
@@ -30,6 +30,7 @@ public class FileManagerController {
         model.addAttribute("parentDirId", parentDirectoryId);
         model.addAttribute("files", fileService.findFilesByDirectoryId(dirId));
         model.addAttribute("dirs", directoryService.findDirectoriesByParentDirectoryId(dirId));
+        model.addAttribute("currentDirId",dirId);
         return "filesPage";
     }
 }

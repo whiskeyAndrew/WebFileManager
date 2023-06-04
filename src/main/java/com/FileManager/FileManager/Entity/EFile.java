@@ -8,7 +8,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class File implements IFile{
+public class EFile implements IFile{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

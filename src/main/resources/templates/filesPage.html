@@ -13,6 +13,34 @@
     </form>
 </div>
 
+<div>
+    <form th:action="|/dirs/${currentDirId}|" method="post" enctype="multipart/form-data">
+        <!--         <a type="file" th:href="|/upload/${currentDirId}|">Загрузить файл</a>-->
+        <input type="file" name="fileToUpload"/>
+        <br>
+        <button type="submit">Сохранить файл</button>
+        <input type="hidden" name="isItFile" value="true">
+        <!--         Костыль-->
+        <input type="hidden" name="dirName" value="">
+        <!--         ~Костыль-->
+    </form>
+</div>
+<br>
+<div>
+    <form th:action="|/dirs/${currentDirId}|" method="post" enctype="multipart/form-data">
+        <label>
+            Создать папку
+            <input type="text" name="dirName" value="">
+        </label>
+        <br>
+        <button type="submit">Сохранить</button>
+        <input type="hidden" name="isItFile" value="false">
+        <!--         Костыль-->
+        <input type="hidden" name="fileToUpload" value=""/>
+        <!--         ~Костыль-->
+    </form>
+</div>
+<br>
 <table class="filesTable">
     <tr>
         <td>Id</td>
