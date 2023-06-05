@@ -4,6 +4,7 @@ import com.FileManager.FileManager.DTO.DirectoryDTO;
 import com.FileManager.FileManager.Entity.Directory;
 import com.FileManager.FileManager.repository.DirectoryRepo;
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class DirectoryService {
     private final DirectoryRepo directoryRepo;
 

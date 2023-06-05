@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href="../filePage.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script th:src="@{../filePage.js}"></script>
+    <script src="../static/filePage.js"></script>
 </head>
-<body>
+<body onload="initPage()">
 
 <div th:if="${parentDirId>=0}">
     <form th:action="@{|/dirs/${parentDirId}|}" method="get">
@@ -53,6 +56,9 @@
                 <button type="submit" class="buttonLikeRow" th:text="${dir.directoryName}"></button>
             </td>
         </form>
+        <td>
+            <button class="js-delete-dir-button" th:id="${dir.id}">Удалить</button>
+        </td>
     </tr>
 </table>
 <br>
@@ -67,6 +73,9 @@
         <td th:text="|${file.fileName}.${file.fileType}|"></td>
         <td th:text="${file.fileSize}"></td>
         <td style="border: 0"><a class="downloadButton" th:href="|/download/${file.id}|">Download</a></td>
+        <td>
+            <button class="js-delete-file-button" th:id="${file.id}">Удалить</button>
+        </td>
     </tr>
 </table>
 </body>

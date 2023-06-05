@@ -6,6 +6,10 @@ import com.FileManager.FileManager.DTO.Interfaces.IFile;
 import com.FileManager.FileManager.Entity.EFile;
 import com.FileManager.FileManager.repository.EFileRepo;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,10 +24,10 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class EFileService {
     private final EFileRepo fileRepo;
     private final DirectoryService directoryService;
-
     @Value("${rootFolder}")
     private String rootFolder;
 
@@ -34,24 +38,26 @@ public class EFileService {
         }
     }
 
-    public void saveFileToDB(EFileDTO file){
+    public void saveFileToDB(EFileDTO file) {
         EFile fileSQL = convertToSQL(file);
         fileRepo.save(fileSQL);
     }
-    public EFileDTO findFileById(Long id){
+
+    public EFileDTO findFileById(Long id) {
         return convertToDTO(fileRepo.findFileById(id));
     }
-    public List<EFileDTO> findFilesByDirectoryId(Long id){
+
+    public List<EFileDTO> findFilesByDirectoryId(Long id) {
         List<EFile> files = fileRepo.findFileByDirectoryId(id);
         List<EFileDTO> filesDTO = new ArrayList<>();
 
-        for(EFile f:files){
+        for (EFile f : files) {
             filesDTO.add(convertToDTO(f));
         }
         return filesDTO;
     }
 
-    private EFile convertToSQL(EFileDTO fileDTO){
+    private EFile convertToSQL(EFileDTO fileDTO) {
         EFile file = new EFile();
         file.setId(fileDTO.getId());
         file.setFileName(fileDTO.getFileName());
@@ -61,6 +67,7 @@ public class EFileService {
         file.setDirectory(fileDTO.getDirectory());
         return file;
     }
+
     private EFileDTO convertToDTO(EFile file) {
         EFileDTO fileDTO = new EFileDTO();
         fileDTO.setFileName(file.getFileName());
@@ -69,6 +76,30 @@ public class EFileService {
         fileDTO.setFileType(file.getFileType());
         fileDTO.setId(file.getId());
         return fileDTO;
+    }
+
+    public boolean handleFileDeleting(Long fileId) {
+        EFile eFile = fileRepo.findFileById(fileId);
+        if(eFile==null){
+            return false;
+        }
+        StringBuilder filePath = new StringBuilder();
+        String fileLocalPath = "";
+        if(eFile.getDirectory().getId()!=0){
+            fileLocalPath = eFile.getDirectory().getFullPath();
+        }
+        filePath.append(rootFolder)
+                .append(fileLocalPath)
+                .append(eFile.getFileName())
+                .append(".")
+                .append(eFile.getFileType());
+
+        //Нужно как-то обдумать, чтобы были бэкапы
+        fileRepo.delete(eFile);
+
+        File file = new File(filePath.toString());
+
+        return file.delete();
     }
 
     public void handleFileSaving(MultipartFile file, Long dirId) {
