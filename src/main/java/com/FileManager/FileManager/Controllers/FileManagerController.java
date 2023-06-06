@@ -1,7 +1,9 @@
 package com.FileManager.FileManager.Controllers;
 
+import com.FileManager.FileManager.DTO.DirectoryDTO;
 import com.FileManager.FileManager.DTO.Interfaces.IDirectory;
 import com.FileManager.FileManager.DTO.Interfaces.IFile;
+import com.FileManager.FileManager.Entity.Directory;
 import com.FileManager.FileManager.services.DirectoryService;
 import com.FileManager.FileManager.services.EFileService;
 import jakarta.annotation.PostConstruct;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -105,12 +108,37 @@ public class FileManagerController {
     @DeleteMapping("/delete/file/{id}")
     public ResponseEntity<RedirectView> deleteFileFromServer(@PathVariable(name = "id") Long fileId) {
         boolean result = fileService.handleFileDeleting(fileId);
-        if(result) {
+        if (result) {
             return ResponseEntity.ok(new RedirectView());
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
-
+    @DeleteMapping("/delete/dir/{id}")
+    public ResponseEntity<RedirectView> deleteDirFromServer(@PathVariable(name = "id") Long dirId, @RequestParam(name = "isDeepDelete") Boolean isDeepDelete) {
+        int result;
+        if (isDeepDelete) {
+            result = directoryService.deepDeleteFromServer(dirId);
+        } else {
+            result = directoryService.deleteDirFromServer(dirId);
+        }
+        switch (result) {
+            case 0 -> {
+                return ResponseEntity.ok(new RedirectView());
+            }
+            case 1 -> {
+                return ResponseEntity.notFound().build();
+            }
+            case 2 -> {
+                return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+            }
+            case 3 -> {
+                return new ResponseEntity<>(HttpStatus.CONFLICT);
+            }
+            default -> {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }
+    }
 }

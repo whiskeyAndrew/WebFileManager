@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="../filePage.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script th:src="@{../filePage.js}"></script>
-    <script src="../static/filePage.js"></script>
 </head>
 <body onload="initPage()">
 
@@ -58,6 +57,9 @@
         </form>
         <td>
             <button class="js-delete-dir-button" th:id="${dir.id}">Удалить</button>
+        </td>
+        <td>
+            <button class="js-deep-delete-dir-button" th:id="${dir.id}">Глубокое удаление</button>
         </td>
     </tr>
 </table>

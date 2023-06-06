@@ -25,7 +25,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class EFileService {
+public class EFileService{
     private final EFileRepo fileRepo;
     private final DirectoryService directoryService;
     @Value("${rootFolder}")
