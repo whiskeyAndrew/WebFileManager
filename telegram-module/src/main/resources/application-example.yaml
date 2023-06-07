@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url:
+    username:
+    password:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+
+server:
+  port: 8081
+
+telegram:
+  bot:
+    name:
+    token:
