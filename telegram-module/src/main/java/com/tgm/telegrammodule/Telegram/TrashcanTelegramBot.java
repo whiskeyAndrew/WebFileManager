@@ -53,19 +53,19 @@ public class TrashcanTelegramBot extends TelegramLongPollingBot {
                          case USER ->{
                              execute(new SendMessage(
                                      update.getMessage().getChatId().toString(),
-                                     "Привет бомжара"));
+                                     "Привет юзер"));
                              authorizationService.authorizeUser(clientId,Role.USER);
                          }
                          case ADMIN -> {
                              execute(new SendMessage(
                                      update.getMessage().getChatId().toString(),
-                                     "Привет сверхбомжара"));
+                                     "Привет суперюзер"));
                              authorizationService.authorizeUser(clientId,Role.ADMIN);
                          }
                          case NOT_VALID -> {
                              execute(new SendMessage(
                                      update.getMessage().getChatId().toString(),
-                                     "Ты кто епта"));
+                                     "Неправильный пароль"));
                              return;
                          }
                          default -> {
