@@ -21,3 +21,8 @@
     border-radius: 1px;
     padding: 1px;
 }
+
+.center1{
+    display: block;
+    margin: 0 auto;
+}

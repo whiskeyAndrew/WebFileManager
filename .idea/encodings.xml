@@ -4,5 +4,6 @@
     <file url="file://$PROJECT_DIR$/file-manager-web-module/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/file-manager/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/telegram-module/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/telegram-module/src/main/resources" charset="UTF-8" />
   </component>
 </project>
