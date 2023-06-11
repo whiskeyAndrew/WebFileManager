@@ -10,6 +10,7 @@ import org.springframework.amqp.core.TopicExchange;
 
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
 import org.springframework.context.annotation.Configuration;
@@ -27,18 +28,21 @@ import java.util.HashMap;
 public class RabbitConfiguration {
 
     @Getter
-    private final String exchangeName = "tg.file-manager.exchange";
+    @Value("${spring.rabbitmq.exchangeName}")
+    private String exchangeName;
     @Getter
-    private final String queueName = "tg.file-manager.queue";
+    @Value("${spring.rabbitmq.queueName}")
+    private String queueName;
 
     @Getter
-    private final String routingKey = "file-manager.actions.logs";
+    @Value("${spring.rabbitmq.routingKey}")
+    private String routingKey;
 
     @Bean
     Queue queue() {
         //true - очередь остается после ребута кролика
         //false - очередь умирает после ребута кролика
-        Queue queue = new Queue(queueName,true);
+        //return new Queue(queueName,true);
         return new Queue(queueName, true, false, false,
                 new HashMap<>() {{
                     put("x-message-ttl", 1000); // TTL в миллисекундах
@@ -46,12 +50,12 @@ public class RabbitConfiguration {
     }
 
     @Bean
-    TopicExchange exchange(){
+    TopicExchange exchange() {
         return new TopicExchange(exchangeName);
     }
 
     @Bean
-    Binding binding(Queue queue, TopicExchange topicExchange){
+    Binding binding(Queue queue, TopicExchange topicExchange) {
         return BindingBuilder.bind(queue).to(topicExchange).with(routingKey);
     }
 

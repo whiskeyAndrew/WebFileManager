@@ -13,9 +13,10 @@ public class Directory implements IDirectory{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String directoryName;
+    private String fullPath;
 
     @ManyToOne
     @JoinColumn(name = "parent_directory")
     private Directory parentDirectory;
-    private String fullPath;
+
 }

@@ -17,6 +17,7 @@ public class EFile implements IFile{
     private String fileType;
     private Long fileSize;
     private String filePath;
+
     @ManyToOne
     @JoinColumn(name = "directory_id")
     private Directory directory;

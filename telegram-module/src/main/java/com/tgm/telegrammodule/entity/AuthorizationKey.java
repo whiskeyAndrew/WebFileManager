@@ -16,7 +16,6 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthorizationKey {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

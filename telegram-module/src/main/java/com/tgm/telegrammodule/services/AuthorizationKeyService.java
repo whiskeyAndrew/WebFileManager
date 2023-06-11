@@ -68,8 +68,8 @@ public class AuthorizationKeyService {
         }
     }
 
-    public AuthorizationKey getKeyByRole(Role role){
-        if(role.equals(Role.USER)){
+    public AuthorizationKey getKeyByRole(Role role) {
+        if (role.equals(Role.USER)) {
             return userKey;
         } else if (role.equals(Role.ADMIN)) {
             return adminKey;

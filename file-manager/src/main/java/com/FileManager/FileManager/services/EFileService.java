@@ -4,15 +4,19 @@ import com.FileManager.FileManager.DTO.EFileDTO;
 import com.FileManager.FileManager.DTO.Interfaces.IDirectory;
 import com.FileManager.FileManager.DTO.Interfaces.IFile;
 import com.FileManager.FileManager.Entity.EFile;
+import com.FileManager.FileManager.RabbitMQ.service.RabbitMessageSender;
 import com.FileManager.FileManager.repository.EFileRepo;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceContext;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -25,11 +29,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class EFileService{
+public class EFileService {
     private final EFileRepo fileRepo;
     private final DirectoryService directoryService;
     @Value("${rootFolder}")
     private String rootFolder;
+    private final RabbitMessageSender rabbitSender;
 
     @PostConstruct
     private void init() {
@@ -75,17 +80,18 @@ public class EFileService{
         fileDTO.setFileSize(file.getFileSize());
         fileDTO.setFileType(file.getFileType());
         fileDTO.setId(file.getId());
+        fileDTO.setDirectory(file.getDirectory());
         return fileDTO;
     }
 
     public boolean handleFileDeleting(Long fileId) {
         EFile eFile = fileRepo.findFileById(fileId);
-        if(eFile==null){
+        if (eFile == null) {
             return false;
         }
         StringBuilder filePath = new StringBuilder();
         String fileLocalPath = "";
-        if(eFile.getDirectory().getId()!=0){
+        if (eFile.getDirectory().getId() != 0) {
             fileLocalPath = eFile.getDirectory().getFullPath();
         }
         filePath.append(rootFolder)
@@ -99,12 +105,21 @@ public class EFileService{
 
         File file = new File(filePath.toString());
 
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        String clientAddr = request.getRemoteAddr();
+        rabbitSender.sendMessage("Удален файл: "
+                + eFile.getFilePath()
+                + "/"
+                + eFile.getFileName()
+                + "."
+                + eFile.getFileType() + ", удалил: " + clientAddr);
+
         return file.delete();
     }
 
-    public void handleFileSaving(MultipartFile file, Long dirId) {
+    public boolean handleFileSaving(MultipartFile file, Long dirId) {
         if (file.isEmpty() || file.getName().equals("")) {
-            return;
+            return false;
         }
 
         try {
@@ -131,8 +146,22 @@ public class EFileService{
             eFile.setFileType(fileName.substring(fileName.lastIndexOf(".") + 1));
             saveFileToDB(eFile);
 
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            String clientAddr = request.getRemoteAddr();
+
+            rabbitSender.sendMessage("Добавлен файл: "
+                    + eFile.getFilePath()
+                    + "/"
+                    + eFile.getFileName()
+                    + "."
+                    + eFile.getFileType()
+                    + ", добавил: "
+                    + clientAddr);
+
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
     }
 

@@ -40,14 +40,15 @@ public class AuthorizationService {
 
         return checkableUser.get().getIsActive();
     }
-    @CachePut(value = "authorizedUsers", key="#id")
+
+    @CachePut(value = "authorizedUsers", key = "#id")
     public boolean authorizeUser(Long id, Role role) {
         if (isUserAuthorized(id)) {
             return false;
         }
 
         Optional<TgUser> user = tgUserRepo.findTgUserById(id);
-        if(user.isPresent()){
+        if (user.isPresent()) {
             user.get().setIsActive(true);
             user.get().setKey(keysService.getKeyByRole(role));
             tgUserRepo.save(user.get());
@@ -67,9 +68,9 @@ public class AuthorizationService {
     }
 
     @CacheEvict(value = "authorizedUsers")
-    public void deauthorizeUser(Long id){
+    public void deauthorizeUser(Long id) {
         Optional<TgUser> user = tgUserRepo.findTgUserById(id);
-        if(user.isEmpty()){
+        if (user.isEmpty()) {
             return;
         }
         user.get().setIsActive(false);

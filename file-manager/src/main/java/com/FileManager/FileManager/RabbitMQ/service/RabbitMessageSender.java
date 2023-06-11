@@ -16,23 +16,25 @@ public class RabbitMessageSender extends Thread {
     private final RabbitConfiguration config;
 
     @PostConstruct
-    private void init(){
-        this.start();
+    private void init() {
+        //this.start();
+        sendMessage("Файловый менеджер поднят");
     }
-    private void sendMessage(String message){
+
+    public void sendMessage(String message) {
         RabbitMessageDTO messageDTO = RabbitMessageDTO.builder()
                 .id(1)
                 .time(Instant.now().toString())
                 .senderName("Server")
                 .message(message)
                 .build();
-        rabbitTemplate.convertAndSend(config.getExchangeName(),config.getRoutingKey(), messageDTO);
+        rabbitTemplate.convertAndSend(config.getExchangeName(), config.getRoutingKey(), messageDTO);
     }
 
-    public void run(){
+    public void run() {
 
         try {
-            while(!isInterrupted()) {
+            while (!isInterrupted()) {
                 Thread.sleep(2000);
                 sendMessage("Hello World");
                 Thread.sleep(2000);

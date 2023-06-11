@@ -3,13 +3,17 @@ package com.FileManager.FileManager.services;
 import com.FileManager.FileManager.DTO.DirectoryDTO;
 import com.FileManager.FileManager.Entity.Directory;
 import com.FileManager.FileManager.Entity.EFile;
+import com.FileManager.FileManager.RabbitMQ.service.RabbitMessageSender;
 import com.FileManager.FileManager.repository.DirectoryRepo;
 import com.FileManager.FileManager.repository.EFileRepo;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.File;
 import java.io.FileReader;
@@ -21,7 +25,7 @@ import java.util.*;
 public class DirectoryService {
     private final DirectoryRepo directoryRepo;
     private final EFileRepo fileRepo;
-
+    private final RabbitMessageSender rabbitSender;
     @Value("${rootFolder}")
     private String rootFolder;
 
@@ -68,26 +72,41 @@ public class DirectoryService {
         return directory;
     }
 
-    public void handleDirectoryCreating(String dirName, Long dirId) {
-        Directory parentDirectory = DirectoryService.convertToSql(findDirectoryById(dirId));
-        StringBuilder fullPath = new StringBuilder();
-        if (parentDirectory.getFullPath() != null) {
-            fullPath.append(parentDirectory.getFullPath());
-        }
-        fullPath.append(dirName);
+    public boolean handleDirectoryCreating(String dirName, Long dirId) {
+        try {
+            Directory parentDirectory = DirectoryService.convertToSql(findDirectoryById(dirId));
+            StringBuilder fullPath = new StringBuilder();
+            if (parentDirectory.getFullPath() != null) {
+                fullPath.append(parentDirectory.getFullPath());
+            }
+            fullPath.append(dirName);
 
-        File dir = new File(rootFolder + fullPath);
-        if (!dir.exists()) {
-            boolean isCreated = dir.mkdirs();
-        } else {
-            return;
-        }
-        DirectoryDTO directory = new DirectoryDTO();
-        directory.setDirectoryName(dirName);
-        directory.setParentDirectory(parentDirectory);
-        directory.setFullPath(fullPath + "/");
+            File dir = new File(rootFolder + fullPath);
+            if (!dir.exists()) {
+                boolean isCreated = dir.mkdirs();
+            } else {
+                return false;
+            }
+            DirectoryDTO directory = new DirectoryDTO();
+            directory.setDirectoryName(dirName);
+            directory.setParentDirectory(parentDirectory);
+            directory.setFullPath(fullPath + "/");
 
-        saveDirectoryInDB(directory);
+            saveDirectoryInDB(directory);
+
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            String clientAddr = request.getRemoteAddr();
+            rabbitSender.sendMessage("Создана директория: "
+                    + fullPath
+                    + "/"
+                    + dirName
+                    + ", создатель: "
+                    + clientAddr);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 
@@ -115,6 +134,16 @@ public class DirectoryService {
         else {
             return 3;
         }
+
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        String clientAddr = request.getRemoteAddr();
+
+        rabbitSender.sendMessage("Удалена директория: "
+                + dirPath
+                + "/"
+                + directory.getDirectoryName()
+                + ", удалил: "
+                + clientAddr);
         return 0;
     }
 
@@ -128,6 +157,15 @@ public class DirectoryService {
         }
 
         deleteFiles(directory);
+
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        String clientAddr = request.getRemoteAddr();
+
+        rabbitSender.sendMessage("Глубокое удаление директории: "
+                + directory.getFullPath() + "/"
+                + directory.getDirectoryName()
+                + ", удалил: "
+                + clientAddr);
         return 0;
     }
 

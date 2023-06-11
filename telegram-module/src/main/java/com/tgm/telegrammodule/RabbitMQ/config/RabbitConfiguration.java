@@ -11,6 +11,7 @@ import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,8 +24,7 @@ public class RabbitConfiguration {
     private final RabbitProperties properties;
 
     @Getter
-    private final String exchangeName = "tg.file-manager.exchange";
-    @Getter
+    @Value("${spring.rabbitmq.queueName}")
     private final String queueName = "tg.file-manager.queue";
 
     @Bean

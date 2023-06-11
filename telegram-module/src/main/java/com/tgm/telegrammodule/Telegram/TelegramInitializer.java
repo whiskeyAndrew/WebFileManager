@@ -14,11 +14,11 @@ public class TelegramInitializer {
     private final TrashcanTelegramBot telegramBot;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         try {
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
             telegramBotsApi.registerBot(telegramBot);
-        } catch (TelegramApiException e){
+        } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }

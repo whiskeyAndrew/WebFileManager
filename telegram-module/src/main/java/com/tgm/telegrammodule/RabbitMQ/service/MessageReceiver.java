@@ -16,11 +16,10 @@ import java.util.concurrent.CountDownLatch;
 @Slf4j
 @RequiredArgsConstructor
 public class MessageReceiver {
-    private final RabbitConfiguration config;
     private final TrashcanTelegramBot bot;
 
-    @RabbitListener(queues = "${spring.rabbitmq.queue}")
-    public void handleMessage(RabbitMessageDTO message){
+    @RabbitListener(queues = "${spring.rabbitmq.queueName}")
+    public void handleMessage(RabbitMessageDTO message) {
         log.info("Received " + message);
         bot.sendMessageToAuthorizedUsers(message.getMessage());
     }

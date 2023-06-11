@@ -12,7 +12,7 @@ import java.util.List;
 public class TgUserService {
     private final TgUserRepo userRepo;
 
-    public List<TgUser> getAuthorizedUsers(){
+    public List<TgUser> getAuthorizedUsers() {
         return userRepo.getAllByIsActiveTrueAndIsBannedFalse();
     }
 }
