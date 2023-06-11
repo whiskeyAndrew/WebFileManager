@@ -2,9 +2,11 @@ package com.tgm.telegrammodule.Telegram;
 
 
 import com.tgm.telegrammodule.Config.TgBotConfig;
+import com.tgm.telegrammodule.entity.TgUser;
 import com.tgm.telegrammodule.enums.Role;
 import com.tgm.telegrammodule.services.AuthorizationKeyService;
 import com.tgm.telegrammodule.services.AuthorizationService;
+import com.tgm.telegrammodule.services.TgUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -23,6 +25,7 @@ public class TrashcanTelegramBot extends TelegramLongPollingBot {
     private final TgBotConfig config;
     private final AuthorizationService authorizationService;
     private final AuthorizationKeyService keyService;
+    private final TgUserService userService;
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -47,38 +50,33 @@ public class TrashcanTelegramBot extends TelegramLongPollingBot {
                     return;
                 }
 
-                if(!authorizationService.isUserAuthorized(clientId)) {
-                     Role userRole = keyService.isKeyValid(msgText);
-                     switch (userRole){
-                         case USER ->{
-                             execute(new SendMessage(
-                                     update.getMessage().getChatId().toString(),
-                                     "Привет юзер"));
-                             authorizationService.authorizeUser(clientId,Role.USER);
-                         }
-                         case ADMIN -> {
-                             execute(new SendMessage(
-                                     update.getMessage().getChatId().toString(),
-                                     "Привет суперюзер"));
-                             authorizationService.authorizeUser(clientId,Role.ADMIN);
-                         }
-                         case NOT_VALID -> {
-                             execute(new SendMessage(
-                                     update.getMessage().getChatId().toString(),
-                                     "Неправильный пароль"));
-                             return;
-                         }
-                         default -> {
-                             execute(new SendMessage(
-                                     update.getMessage().getChatId().toString(),
-                                     "Ты как сюда попал?"));
+                if (!authorizationService.isUserAuthorized(clientId)) {
+                    Role userRole = keyService.isKeyValid(msgText);
+                    switch (userRole) {
+                        case USER -> {
+                            execute(new SendMessage(
+                                    update.getMessage().getChatId().toString(),
+                                    "Привет юзер"));
+                            authorizationService.authorizeUser(clientId, Role.USER);
+                        }
+                        case ADMIN -> {
+                            execute(new SendMessage(
+                                    update.getMessage().getChatId().toString(),
+                                    "Привет суперюзер"));
+                            authorizationService.authorizeUser(clientId, Role.ADMIN);
+                        }
+                        case NOT_VALID -> execute(new SendMessage(
+                                update.getMessage().getChatId().toString(),
+                                "Неправильный пароль"));
 
-                         }
-                     }
-                     return;
+                        default -> execute(new SendMessage(
+                                update.getMessage().getChatId().toString(),
+                                "Ты как сюда попал?"));
                     }
-                switch (msgText){
-                    case "/exit" ->{
+                    return;
+                }
+                switch (msgText) {
+                    case "/exit" -> {
                         deauthorizeUser(clientId);
                         execute(new SendMessage(
                                 update.getMessage().getChatId().toString(),
@@ -97,9 +95,21 @@ public class TrashcanTelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private void deauthorizeUser(Long id){
+    public void sendMessageToAuthorizedUsers(String message) {
+        for (TgUser user : userService.getAuthorizedUsers()) {
+            try {
+                execute(new SendMessage(user.getId().toString(), message));
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    private void deauthorizeUser(Long id) {
         authorizationService.deauthorizeUser(id);
     }
+
     @Override
     public void onUpdatesReceived(List<Update> updates) {
         super.onUpdatesReceived(updates);
