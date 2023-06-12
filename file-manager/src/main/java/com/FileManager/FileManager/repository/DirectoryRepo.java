@@ -10,4 +10,6 @@ public interface DirectoryRepo extends JpaRepository<Directory, Long> {
     Directory findDirectoryById(Long id);
     Directory findDirectoryByParentDirectoryId(Long id);
     Directory findDirectoryByParentDirectoryIdAndDirectoryName(Long id,  String dirName);
+    Directory findFirstByOrderByIdDesc();
+    Directory findDirectoryByDirectoryName(String dirName);
 }

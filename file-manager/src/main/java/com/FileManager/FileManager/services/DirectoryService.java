@@ -40,6 +40,9 @@ public class DirectoryService {
         directoryRepo.save(convertToSql(directory));
     }
 
+    public DirectoryDTO findDirectoryByDirName(String dirName){
+        return convertToDTO(directoryRepo.findDirectoryByDirectoryName(dirName));
+    }
     public List<DirectoryDTO> findDirectoriesByParentDirectoryId(Long id) {
         List<Directory> directories = directoryRepo.findDirectoriesByParentDirectoryId(id);
         List<DirectoryDTO> directoryDTOS = new ArrayList<>();
@@ -51,6 +54,9 @@ public class DirectoryService {
 
     public DirectoryDTO findDirectoryById(Long id) {
         Directory directory = directoryRepo.findDirectoryById(id);
+        if(directory==null){
+            return null;
+        }
         return convertToDTO(directory);
     }
 
@@ -72,9 +78,9 @@ public class DirectoryService {
         return directory;
     }
 
-    public boolean handleDirectoryCreating(String dirName, Long dirId) {
+    public boolean handleDirectoryCreating(String dirName, Long parentDirId) {
         try {
-            Directory parentDirectory = DirectoryService.convertToSql(findDirectoryById(dirId));
+            Directory parentDirectory = DirectoryService.convertToSql(findDirectoryById(parentDirId));
             StringBuilder fullPath = new StringBuilder();
             if (parentDirectory.getFullPath() != null) {
                 fullPath.append(parentDirectory.getFullPath());
@@ -201,5 +207,9 @@ public class DirectoryService {
         directoryRepo.delete(directory);
         boolean folderDeleteResult = folder.delete();
 
+    }
+
+    public DirectoryDTO findLastAddedDirectory(){
+        return convertToDTO(directoryRepo.findFirstByOrderByIdDesc());
     }
 }
