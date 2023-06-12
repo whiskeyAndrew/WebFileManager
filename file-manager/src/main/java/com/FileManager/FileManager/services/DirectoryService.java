@@ -78,6 +78,9 @@ public class DirectoryService {
         return directory;
     }
 
+    public List<Directory> getAllDirectories(){
+        return directoryRepo.getAllByIdGreaterThan(-1L);
+    }
     public boolean handleDirectoryCreating(String dirName, Long parentDirId) {
         try {
             Directory parentDirectory = DirectoryService.convertToSql(findDirectoryById(parentDirId));

@@ -65,9 +65,9 @@ public class RabbitConfiguration {
         return new Jackson2JsonMessageConverter();
     }
 
-    @Bean
-    ConnectionFactory connectionFactory(){
-        return new CachingConnectionFactory();
-    }
+//    @Bean
+//    ConnectionFactory connectionFactory(){
+//        return new CachingConnectionFactory();
+//    }
 
 }

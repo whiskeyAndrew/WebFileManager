@@ -65,7 +65,7 @@ public class FileManagerController {
     }
 
     @PostMapping("/dirs/{id}")
-    private RedirectView uploadFileOnServer(@RequestParam(name = "fileToUpload", required = false) MultipartFile file,
+    public RedirectView uploadFileOnServer(@RequestParam(name = "fileToUpload", required = false) MultipartFile file,
                                             @PathVariable(name = "id") Long dirId,
                                             @RequestParam(name = "isItFile") boolean isItFile,
                                             @RequestParam(name = "dirName") String dirName) {

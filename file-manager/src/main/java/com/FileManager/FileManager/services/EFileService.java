@@ -43,13 +43,20 @@ public class EFileService {
         }
     }
 
+    public List<EFile> getAllFilesFromDB(){
+        return fileRepo.getAllByIdGreaterThan(-1L);
+    }
     public void saveFileToDB(EFileDTO file) {
         EFile fileSQL = convertToSQL(file);
         fileRepo.save(fileSQL);
     }
 
     public EFileDTO findFileById(Long id) {
-        return convertToDTO(fileRepo.findFileById(id));
+        EFile file = fileRepo.findFileById(id);
+        if(file==null){
+            return null;
+        }
+        return convertToDTO(file);
     }
 
     public List<EFileDTO> findFilesByDirectoryId(Long id) {
@@ -163,6 +170,10 @@ public class EFileService {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public EFileDTO findLastUploadedFile(){
+        return convertToDTO(fileRepo.findFirstByOrderByIdDesc());
     }
 
 

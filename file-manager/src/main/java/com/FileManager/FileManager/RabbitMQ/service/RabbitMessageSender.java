@@ -4,6 +4,7 @@ import com.FileManager.FileManager.RabbitMQ.DTO.RabbitMessageDTO;
 import com.FileManager.FileManager.RabbitMQ.config.RabbitConfiguration;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.AmqpConnectException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
@@ -18,30 +19,36 @@ public class RabbitMessageSender extends Thread {
     @PostConstruct
     private void init() {
         //this.start();
+        rabbitTemplate.setReceiveTimeout(5000);
+        rabbitTemplate.setReplyTimeout(5000);
         sendMessage("Файловый менеджер поднят");
     }
 
     public void sendMessage(String message) {
-        RabbitMessageDTO messageDTO = RabbitMessageDTO.builder()
-                .id(1)
-                .time(Instant.now().toString())
-                .senderName("Server")
-                .message(message)
-                .build();
-        rabbitTemplate.convertAndSend(config.getExchangeName(), config.getRoutingKey(), messageDTO);
+        try {
+            RabbitMessageDTO messageDTO = RabbitMessageDTO.builder()
+                    .id(1)
+                    .time(Instant.now().toString())
+                    .senderName("Server")
+                    .message(message)
+                    .build();
+            rabbitTemplate.convertAndSend(config.getExchangeName(), config.getRoutingKey(), messageDTO);
+        } catch (AmqpConnectException e){
+            e.printStackTrace();
+        }
     }
 
     public void run() {
 
-        try {
-            while (!isInterrupted()) {
-                Thread.sleep(2000);
-                sendMessage("Hello World");
-                Thread.sleep(2000);
-                sendMessage("Hello world but two");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            while (!isInterrupted()) {
+//                Thread.sleep(2000);
+//                sendMessage("Hello World");
+//                Thread.sleep(2000);
+//                sendMessage("Hello world but two");
+//            }
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
     }
 }
