@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db:5432/FileManagerDB
+    username: postgres
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+  devtools:
+  #    restart:
+  #      enabled: true
+  #      additional-paths: src/main/resources/templates
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  flyway:
+    baseline-on-migrate: true
+    locations: filesystem:db/migration
+    enabled: false
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    exchangeName: tg.file-manager.exchange
+    queueName: tg.file-manager.queue
+    routingKey: file-manager.actions.logs
+
+rootFolder: home/files
