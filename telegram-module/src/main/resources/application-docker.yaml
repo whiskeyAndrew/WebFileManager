@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db-tg:5432/TGDB
+    username: postgres
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+    queueName: tg.file-manager.queue
+
+server:
+  port: 8081
+
+telegram:
+  bot:
+    name: UsefulTrashcanBot
+    token:

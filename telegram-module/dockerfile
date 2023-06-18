@@ -2,14 +2,13 @@ FROM maven:3.8-openjdk-17 AS build
 MAINTAINER andrew
 #По какой-то причине без чистки кэша отказывается работать clean мавена
 RUN rm -rf /root/.m2/repository
-WORKDIR /fileManager
+WORKDIR /tgModule
 COPY . .
 COPY src/main/resources/application-docker.yaml src/main/resources/application.yaml
 RUN mvn clean package -DskipTests
 
 FROM openjdk:17-alpine
 WORKDIR /app
-COPY --from=build /fileManager/target/FileManager.jar .
-COPY --from=build /fileManager/db/migration ./db/migration
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "FileManager.jar"]
+COPY --from=build /tgModule/target/TelegramModule.jar .
+EXPOSE 8081
+ENTRYPOINT ["java", "-jar", "TelegramModule.jar"]

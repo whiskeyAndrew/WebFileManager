@@ -18,9 +18,9 @@ public class RabbitMessageSender extends Thread {
 
     @PostConstruct
     private void init() {
-        //this.start();
-        rabbitTemplate.setReceiveTimeout(5000);
-        rabbitTemplate.setReplyTimeout(5000);
+//        this.start();
+        rabbitTemplate.setReceiveTimeout(30000);
+        rabbitTemplate.setReplyTimeout(30000);
         sendMessage("Файловый менеджер поднят");
     }
 

@@ -1,13 +1,17 @@
+#В первую очередь надо чтобы собрались и запустились rabbit и базы данных, затем нужно собрать fileManager и telegramBot
+#там в идеале бы сделать задержку секунд в 30 чтобы подождать стартапа кролика перед запуском приложений
+#Но она в докере как-то по особенному делается, чуть позже надо бы разобраться
 services:
-#  rabbitmq:
-#    image: rabbitmq:3-management-alpine
-#    container_name: fileManager-rabbitMq
-#    ports:
-#      - 5672:5672
-#      - 15672:15672
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitMq
+    ports:
+      - 5672:5672
+      - 15672:15672
 
-  db:
+  db-fileManager:
     image: postgres
+    container_name: db-fileManager
     restart: always
     environment:
       POSTGRES_PASSWORD: 1234
@@ -16,17 +20,31 @@ services:
     ports:
       - 5433:5432
 
+  db-tg:
+    image: postgres
+    container_name: db-tg
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_USER: postgres
+      POSTGRES_DB: TGDB
+    ports:
+      - 5434:5432
+
   file-manager:
     container_name: fileManager
     build: /file-manager
     depends_on:
-#      - rabbitmq
-      - db
-    links:
-      - db
+      - rabbitmq
+      - db-fileManager
     ports:
       - 8080:8080
 
-networks:
-  main-network:
-    driver: bridge
+  telegram-module:
+    container_name: telegramBot
+    build: /telegram-module
+    depends_on:
+      - rabbitmq
+      - db-tg
+    ports:
+      - 8081:8081

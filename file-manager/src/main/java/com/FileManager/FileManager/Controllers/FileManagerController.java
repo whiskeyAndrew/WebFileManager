@@ -10,6 +10,7 @@ import com.FileManager.FileManager.services.EFileService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.InputStreamSource;
@@ -25,12 +26,13 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.view.RedirectView;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.swing.filechooser.FileSystemView;
+import java.io.*;
+import java.util.Arrays;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class FileManagerController {
 
     private final EFileService fileService;
@@ -40,6 +42,8 @@ public class FileManagerController {
 
     @PostConstruct
     void init() {
+        //костыль
+        log.info(FileSystemView.getFileSystemView().getHomeDirectory().toString());
         if (!rootFolder.endsWith("/")) {
             rootFolder = rootFolder + "/";
         }
@@ -66,9 +70,9 @@ public class FileManagerController {
 
     @PostMapping("/dirs/{id}")
     public RedirectView uploadFileOnServer(@RequestParam(name = "fileToUpload", required = false) MultipartFile file,
-                                            @PathVariable(name = "id") Long dirId,
-                                            @RequestParam(name = "isItFile") boolean isItFile,
-                                            @RequestParam(name = "dirName") String dirName) {
+                                           @PathVariable(name = "id") Long dirId,
+                                           @RequestParam(name = "isItFile") boolean isItFile,
+                                           @RequestParam(name = "dirName") String dirName) {
         RedirectView redirectView = new RedirectView();
         redirectView.setUrl("/dirs/" + dirId);
 
